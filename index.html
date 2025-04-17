@@ -35,6 +35,52 @@
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
+        .item-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .item-form input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+        .item-form button {
+            padding: 10px 15px;
+            background: #50b3a2;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .item-form button:hover {
+            background: #3a8a7e;
+        }
+        .shopping-list {
+            list-style: none;
+            padding: 0;
+        }
+        .shopping-list li {
+            padding: 10px;
+            margin-bottom: 5px;
+            background: #f9f9f9;
+            border-left: 4px solid #50b3a2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .shopping-list li button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .shopping-list li button:hover {
+            background: #e05555;
+        }
     </style>
 </head>
 <body>
@@ -48,7 +94,103 @@
         <div class="content">
             <h2>Welcome to My Portfolio</h2>
             <p>This is a simple portfolio website showcasing my work and skills.</p>
+            
+            <h3>Shopping List</h3>
+            <div class="item-form">
+                <input type="text" id="itemInput" placeholder="Enter item name...">
+                <button id="addItemBtn">Add Item</button>
+            </div>
+            
+            <ul id="shoppingList" class="shopping-list">
+                <!-- Items will be added here dynamically -->
+            </ul>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const itemInput = document.getElementById('itemInput');
+            const addItemBtn = document.getElementById('addItemBtn');
+            const shoppingList = document.getElementById('shoppingList');
+            
+            // Load items from localStorage if available
+            loadItems();
+            
+            // Add item when button is clicked
+            addItemBtn.addEventListener('click', addItem);
+            
+            // Add item when Enter key is pressed
+            itemInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addItem();
+                }
+            });
+            
+            function addItem() {
+                const itemText = itemInput.value.trim();
+                
+                if (itemText !== '') {
+                    // Create new item
+                    const li = document.createElement('li');
+                    const itemSpan = document.createElement('span');
+                    itemSpan.textContent = itemText;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Delete';
+                    deleteBtn.addEventListener('click', function() {
+                        li.remove();
+                        saveItems();
+                    });
+                    
+                    li.appendChild(itemSpan);
+                    li.appendChild(deleteBtn);
+                    shoppingList.appendChild(li);
+                    
+                    // Clear input
+                    itemInput.value = '';
+                    itemInput.focus();
+                    
+                    // Save to localStorage
+                    saveItems();
+                }
+            }
+            
+            function saveItems() {
+                const items = [];
+                const itemElements = shoppingList.querySelectorAll('li span');
+                
+                itemElements.forEach(function(item) {
+                    items.push(item.textContent);
+                });
+                
+                localStorage.setItem('shoppingItems', JSON.stringify(items));
+            }
+            
+            function loadItems() {
+                const savedItems = localStorage.getItem('shoppingItems');
+                
+                if (savedItems) {
+                    const items = JSON.parse(savedItems);
+                    
+                    items.forEach(function(itemText) {
+                        const li = document.createElement('li');
+                        const itemSpan = document.createElement('span');
+                        itemSpan.textContent = itemText;
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.textContent = 'Delete';
+                        deleteBtn.addEventListener('click', function() {
+                            li.remove();
+                            saveItems();
+                        });
+                        
+                        li.appendChild(itemSpan);
+                        li.appendChild(deleteBtn);
+                        shoppingList.appendChild(li);
+                    });
+                }
+            }
+        });
+    </script>
 </body>
 </html>
